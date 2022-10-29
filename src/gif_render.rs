@@ -3,6 +3,7 @@ use plotters::coord::Shift;
 use plotters::prelude::*;
 
 /// Viewer is used for rendering the state of an environment
+#[allow(dead_code)]
 pub struct GifRender<'a> {
     pub(crate) width: u32,
     pub(crate) height: u32,

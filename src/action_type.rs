@@ -2,7 +2,7 @@
 #[derive(Clone, Debug)]
 pub enum ActionType {
     /// A discrete action
-    Discrete(u8),
+    Discrete(u32),
 
     /// A continuous action
     Continuous(Vec<f64>),

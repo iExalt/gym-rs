@@ -1,3 +1,4 @@
+use std::collections::HashMap;
 use crate::{ActionType, GifRender};
 
 /// The trait which defines the needed methods an environment needs to provide
@@ -12,14 +13,14 @@ pub trait GymEnv {
         observation: agent's observation of the current environment
         reward: amount of reward returned after previous action
         done: whether the episode has ended
-        info: optional information string
+        info: optional information dict
     **/
-    fn step(&mut self, action: ActionType) -> (Vec<f64>, f64, bool, Option<String>);
+    fn step(&mut self, action: ActionType) -> (Vec<f32>, f32, bool, Option<HashMap<String, String>>);
 
     /// Reset the environment to an initial state
     /// This function should not reset reset the environment's random number generator(s)
     /// Returns the environments initial state
-    fn reset(&mut self) -> Vec<f64>;
+    fn reset(&mut self) -> Vec<f32>;
 
     /// Render the environment
     fn render(&self, viewer: &mut GifRender);
