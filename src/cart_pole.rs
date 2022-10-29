@@ -1,7 +1,7 @@
 extern crate find_folder;
 
-use std::collections::HashMap;
 use crate::{ActionType, GifRender, GymEnv};
+use std::collections::HashMap;
 // use plotters::prelude::*;
 use rand::distributions::Uniform;
 use rand::prelude::*;
@@ -69,8 +69,6 @@ pub struct CartPoleEnv {
     x_threshold: f32,
     rng: StdRng,
     state: [f32; 4],
-    steps_beyond_done: Option<usize>,
-    score: f32, // cumulative reward used to rendering to window
 }
 
 #[derive(Debug)]
@@ -99,14 +97,15 @@ impl Default for CartPoleEnv {
             x_threshold: 2.4,
             rng: StdRng::from_entropy(),
             state: [0.0; 4],
-            steps_beyond_done: None,
-            score: 0.0,
         }
     }
 }
 
 impl GymEnv for CartPoleEnv {
-    fn step(&mut self, action: ActionType) -> (Vec<f32>, f32, bool, Option<HashMap<String, String>>) {
+    fn step(
+        &mut self,
+        action: ActionType,
+    ) -> (Vec<f32>, f32, bool, Option<HashMap<String, String>>) {
         let action = match action {
             ActionType::Discrete(v) => v,
             ActionType::Continuous(_) => panic!("wrong action type provided"),
@@ -152,25 +151,11 @@ impl GymEnv for CartPoleEnv {
             || theta < -self.theta_threshold_radians
             || theta > self.theta_threshold_radians;
 
-        let reward = if !done {
-            1.0
-        } else if self.steps_beyond_done.is_none() {
-            // pole just fell
-            self.steps_beyond_done = Some(0);
-            1.0
+        return if done {
+            (self.reset(), 0.0, done, None)
         } else {
-            if self.steps_beyond_done.unwrap() == 0 {
-                warn!(
-                    "You are calling 'step()' even though this \
-                environment has already returned done = true. You should always call 'reset()' \
-                once you receive 'done = true' -- any further steps are undefined behaviour"
-                );
-            }
-            0.0
+            (self.state.to_vec(), 1.0, done, None)
         };
-        self.score += reward;
-
-        (self.state.to_vec(), reward, done, None)
     }
 
     fn reset(&mut self) -> Vec<f32> {
@@ -181,8 +166,6 @@ impl GymEnv for CartPoleEnv {
             self.rng.sample(d),
             self.rng.sample(d),
         ];
-        self.steps_beyond_done = None;
-        self.score = 0.0;
 
         self.state.to_vec()
     }
