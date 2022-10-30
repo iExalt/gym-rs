@@ -69,6 +69,8 @@ pub struct CartPoleEnv {
     x_threshold: f32,
     rng: StdRng,
     state: [f32; 4],
+    episodic_return: f32,
+    episodic_length: u32,
 }
 
 #[derive(Debug)]
@@ -97,6 +99,8 @@ impl Default for CartPoleEnv {
             x_threshold: 2.4,
             rng: StdRng::from_entropy(),
             state: [0.0; 4],
+            episodic_return: 0.0,
+            episodic_length: 0,
         }
     }
 }
@@ -151,10 +155,28 @@ impl GymEnv for CartPoleEnv {
             || theta < -self.theta_threshold_radians
             || theta > self.theta_threshold_radians;
 
+        let reward: f32 = match done {
+            true => 0.,
+            false => 1.,
+        };
+
+        self.episodic_return += reward;
+        self.episodic_length += 1;
+
         return if done {
-            (self.reset(), 0.0, done, None)
+            let info = Some(HashMap::from([
+                (
+                    "episodic_return".parse().unwrap(),
+                    self.episodic_return.to_string(),
+                ),
+                (
+                    "episodic_length".parse().unwrap(),
+                    self.episodic_length.to_string(),
+                ),
+            ]));
+            (self.reset(), reward, done, info)
         } else {
-            (self.state.to_vec(), 1.0, done, None)
+            (self.state.to_vec(), reward, done, None)
         };
     }
 
@@ -166,6 +188,8 @@ impl GymEnv for CartPoleEnv {
             self.rng.sample(d),
             self.rng.sample(d),
         ];
+        self.episodic_return = 0.0;
+        self.episodic_length = 0;
 
         self.state.to_vec()
     }
