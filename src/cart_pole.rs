@@ -108,7 +108,7 @@ impl GymEnv for CartPoleEnv {
     ) -> (Vec<f32>, f32, bool, Option<HashMap<String, String>>) {
         let action = match action {
             ActionType::Discrete(v) => v,
-            ActionType::Continuous(_) => panic!("wrong action type provided"),
+            // ActionType::Continuous(_) => panic!("wrong action type provided"),
         };
 
         let mut x = self.state[0];
