@@ -153,7 +153,8 @@ impl GymEnv for CartPoleEnv {
         let done: bool = x < -self.x_threshold
             || x > self.x_threshold
             || theta < -self.theta_threshold_radians
-            || theta > self.theta_threshold_radians;
+            || theta > self.theta_threshold_radians
+            || self.episodic_length > 200;
 
         let reward: f32 = match done {
             true => 0.,
