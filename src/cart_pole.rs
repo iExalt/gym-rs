@@ -47,7 +47,7 @@ Starting State:
     Pole Angle is more than 12 degrees.
     Cart Position is more than 2.4 (center of the cart reaches the edge of
     the display).
-    Episode length is greater than 200.
+    Episode length is greater than 500.
     Solved Requirements:
     Considered solved when the average return is greater than or equal to
     195.0 over 100 consecutive trials.
@@ -150,19 +150,14 @@ impl GymEnv for CartPoleEnv {
         }
         self.state = [x, x_dot, theta, theta_dot];
 
+        self.episodic_return += 1.0;
+        self.episodic_length += 1;
+
         let done: bool = x < -self.x_threshold
             || x > self.x_threshold
             || theta < -self.theta_threshold_radians
             || theta > self.theta_threshold_radians
-            || self.episodic_length > 200;
-
-        let reward: f32 = match done {
-            true => 0.,
-            false => 1.,
-        };
-
-        self.episodic_return += reward;
-        self.episodic_length += 1;
+            || self.episodic_length >= 500;
 
         return if done {
             let info = Some(HashMap::from([
@@ -175,9 +170,9 @@ impl GymEnv for CartPoleEnv {
                     self.episodic_length.to_string(),
                 ),
             ]));
-            (self.reset(), reward, done, info)
+            (self.reset(), 1.0, done, info)
         } else {
-            (self.state.to_vec(), reward, done, None)
+            (self.state.to_vec(), 1.0, done, None)
         };
     }
 
