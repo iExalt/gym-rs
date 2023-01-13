@@ -15,7 +15,7 @@ pub trait GymEnv {
         done: whether the episode has ended
         info: optional information dict
     **/
-    fn step(&mut self, action: ActionType) -> (Vec<f32>, f32, bool, Option<HashMap<String, String>>);
+    fn step(&mut self, action: usize) -> (Vec<f32>, f32, bool, Option<HashMap<String, String>>);
 
     /// Reset the environment to an initial state
     /// This function should not reset reset the environment's random number generator(s)

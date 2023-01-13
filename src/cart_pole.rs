@@ -108,12 +108,8 @@ impl Default for CartPoleEnv {
 impl GymEnv for CartPoleEnv {
     fn step(
         &mut self,
-        action: ActionType,
+        action: usize,
     ) -> (Vec<f32>, f32, bool, Option<HashMap<String, String>>) {
-        let action = match action {
-            ActionType::Discrete(v) => v,
-            // ActionType::Continuous(_) => panic!("wrong action type provided"),
-        };
 
         let mut x = self.state[0];
         let mut x_dot = self.state[1];
